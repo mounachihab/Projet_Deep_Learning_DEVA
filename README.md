@@ -83,6 +83,7 @@ Transcript **— raw/Transcript/Full/**
 - devanet\_modules.py – Modules : MFU, projecteurs audio/vidéo, alignement multimodal
 - deva.py – Implémente l’architecture multimodale complète :TextEncoder, AED/VED, TPF, CrossTransformer, tête finale.
 - bert.py – Encapsulation BERT/RoBERTa : extraction d’embeddings 768 dims
+  Lien BERT : (https://huggingface.co/google-bert/bert-base-uncased)
 
 
 - tpf\_layer.py – Implémentation complète du TPF (Token Pivot Fusion) : Transformers, cross-attention, pré-normalisation
@@ -176,5 +177,40 @@ Les métriques utilisées pour MOSI sont :
 - **MSE** – Mean Squared Error
 - **Pearson r** – corrélation texte↔prédiction
 - **CCC** – Concordance Correlation Coefficient (référence dans la littérature)
+
+### Comparaison labels (ChatGPT) vs labels (kaggle)
+
+  Dans notre projet, nous avons évalué deux jeux de labels (car non existant dans le dataset initial) :
+- Labels ChatGPT — générés automatiquement à partir des transcriptions
+- Labels Prof/Kaggle — fournis dans les datasets officiels MOSI/MOSEI
+Comparaison directe des labels :
+L’analyse statistique montre un écart massif entre les deux sources :
+    •	Taux d’hallucination : 96.77 %
+Dans 96.77 % des segments, les labels ChatGPT ne correspondent pas du tout aux vraies annotations humaines.
+    •	Écart moyen : 1.6 points sur une échelle [-3, +3]
+Cela représente 27 % d’erreur relative, ce qui est énorme pour un problème de régression fine.
+ Impact sur le modèle multimodal :
+Lorsque l’on entraîne notre DEVANet sur les labels ChatGPT, les résultats semblent bons :
+Données ChatGPT — Test
+    •	Acc-2 : 0.7895
+    •	F1 : 0.7823
+    •	MAE : 0.9205
+    •	Corr : 0.7548
+Mais avec les labels officiels, les performances chutent :
+Données Prof/Kaggle — Test
+    •	Acc-2 : 0.6842
+    •	F1 : 0.6842
+    •	MAE : 1.2762
+    •	Corr : 0.2941
+Interprétation :
+
+Le modèle paraît meilleur avec les labels ChatGPT mais uniquement parce que
+ChatGPT génère des labels plus faciles, plus réguliers et moins nuancés que les annotations humaines.
+Le modèle apprend des tendances artificielles, pas des émotions réelles.
+Conclusion : quel jeu de labels choisir ?
+
+-	Les labels ChatGPT ne peuvent pas servir de référence, car ils ne capturent pas la complexité émotionnelle réelle et introduisent un fort biais.
+-	Les labels Kaggle/Prof sont indispensables : ce sont les annotations humaines utilisées dans tous les benchmarks MOSI/MOSEI.
+
 
 
